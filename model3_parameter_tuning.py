@@ -19,7 +19,6 @@ from sklearn.model_selection import cross_val_score
 
 
 # Import GridSearch for parameter optimization
-
 from sklearn.model_selection import GridSearchCV
 
 # Import scaler
