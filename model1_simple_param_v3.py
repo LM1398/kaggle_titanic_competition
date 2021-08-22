@@ -1,21 +1,22 @@
 # import basics
-import pandas as pd
+from typing import Union
 
-# import scaler
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
+import numpy as np
+import pandas as pd
 
 # import estimators
 from sklearn import tree
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.linear_model import LogisticRegression
+
+# import GridSearch for parameter optimization
 from sklearn.model_selection import cross_val_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.ensemble import VotingClassifier
 
-# import GridSearch for parameter optimization
-from sklearn.model_selection import GridSearchCV
+# import scaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.svm import SVC
 
 
 def main():
