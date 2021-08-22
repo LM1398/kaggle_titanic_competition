@@ -31,8 +31,8 @@ def main():
     test["Parch"] = MinMaxScaler().fit_transform(test[["Parch"]])
     test["SibSp"] = MinMaxScaler().fit_transform(test[["SibSp"]])
 
-    test["Age"].fillna(X_test.Age.mean(), inplace=True)
-    test["Fare"].fillna(X_test.Fare.median(), inplace=True)
+    test["Age"].fillna(test.Age.mean(), inplace=True)
+    test["Fare"].fillna(test.Fare.median(), inplace=True)
 
     dummies2 = pd.get_dummies(test[["Sex", "Embarked"]])
     test = pd.concat([test, dummies2], axis=1)
