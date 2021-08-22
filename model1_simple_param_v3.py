@@ -1,10 +1,21 @@
 # import basics
 import pandas as pd
 
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import pandas as pd
-    import seaborn as sns
+# import scaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+
+# import estimators
+from sklearn import tree
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import VotingClassifier
+
+# import GridSearch for parameter optimization
+from sklearn.model_selection import GridSearchCV
 
     titanic = pd.read_csv("/Users/leo/samurai/kaggle/titanic/data/train.csv")
 
