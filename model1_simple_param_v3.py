@@ -19,9 +19,45 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.svm import SVC
 
 
-def main():
+def scale_numeric_features(df: pd.DataFrame) -> pd.DataFrame:
+    df["Fare"] = StandardScaler().fit_transform(df[["Fare"]])
+    df["Age"] = MinMaxScaler().fit_transform(df[["Age"]])
+    df["Pclass"] = MinMaxScaler().fit_transform(df[["Pclass"]])
+    df["Parch"] = MinMaxScaler().fit_transform(df[["Parch"]])
+    df["SibSp"] = MinMaxScaler().fit_transform(df[["SibSp"]])
+    return df
 
-    titanic = pd.read_csv("/Users/leo/samurai/kaggle/titanic/data/train.csv")
+
+def concat_dummies(df: pd.DataFrame) -> pd.DataFrame:
+    dummies = pd.get_dummies(df[["Sex", "Embarked"]])
+    df = pd.concat([df, dummies], axis=1)
+    return df
+
+
+def fillna(df: pd.DataFrame) -> pd.DataFrame:
+    df["Age"].fillna(df.Age.mean(), inplace=True)
+    df["Fare"].fillna(df.Fare.median(), inplace=True)
+    return df
+
+
+def modeling_cv(
+    X: pd.DataFrame,
+    y: pd.Series,
+    model: Union[
+        LogisticRegression,
+        GaussianNB,
+        tree.DecisionTreeClassifier,
+        KNeighborsClassifier,
+        RandomForestClassifier,
+        SVC,
+    ],
+    **kwargs
+) -> np.ndarray:
+    clf = model(kwargs)
+    cv = cross_val_score(clf, X, y, cv=5)
+    print(cv)
+    print(cv.mean())
+    return clf
 
     titanic["Fare"] = StandardScaler().fit_transform(titanic[["Fare"]])
     titanic["Age"] = MinMaxScaler().fit_transform(titanic[["Age"]])
