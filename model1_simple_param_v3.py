@@ -59,11 +59,6 @@ def modeling_cv(
     print(cv.mean())
     return clf
 
-    titanic["Fare"] = StandardScaler().fit_transform(titanic[["Fare"]])
-    titanic["Age"] = MinMaxScaler().fit_transform(titanic[["Age"]])
-    titanic["Pclass"] = MinMaxScaler().fit_transform(titanic[["Pclass"]])
-    titanic["Parch"] = MinMaxScaler().fit_transform(titanic[["Parch"]])
-    titanic["SibSp"] = MinMaxScaler().fit_transform(titanic[["SibSp"]])
 
     titanic = titanic.dropna(subset=["Age"])
     titanic = titanic.dropna(subset=["Embarked"])
