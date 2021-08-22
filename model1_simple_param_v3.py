@@ -60,64 +60,42 @@ def modeling_cv(
     return clf
 
 
-    titanic = titanic.dropna(subset=["Age"])
-    titanic = titanic.dropna(subset=["Embarked"])
+def create_submission(clf: VotingClassifier, df: pd.DataFrame) -> None:
+    y_hat_base_vc = clf.predict(df).astype(int)
+    basic_submission = {"PassengerId": df.PassengerId, "Survived": y_hat_base_vc}
+    base_submission = pd.DataFrame(data=basic_submission)
+    base_submission.to_csv("base_submission.csv", index=False)
 
-    dummies = pd.get_dummies(titanic[["Sex", "Embarked"]])
-    titanic = pd.concat([titanic, dummies], axis=1)
 
-    titanic.drop(columns=["Ticket", "Name", "Cabin", "Embarked", "Sex"], inplace=True)
+def main():
 
+    # Load
+    train = pd.read_csv("/Users/leo/samurai/kaggle/titanic/data/train.csv")
     test = pd.read_csv("/Users/leo/samurai/kaggle/titanic/data/test.csv")
 
-    test["Fare"] = StandardScaler().fit_transform(test[["Fare"]])
-    test["Age"] = MinMaxScaler().fit_transform(test[["Age"]])
-    test["Pclass"] = MinMaxScaler().fit_transform(test[["Pclass"]])
-    test["Parch"] = MinMaxScaler().fit_transform(test[["Parch"]])
-    test["SibSp"] = MinMaxScaler().fit_transform(test[["SibSp"]])
-
-    test["Age"].fillna(test.Age.mean(), inplace=True)
-    test["Fare"].fillna(test.Fare.median(), inplace=True)
-
-    dummies2 = pd.get_dummies(test[["Sex", "Embarked"]])
-    test = pd.concat([test, dummies2], axis=1)
-
+    # Preprocess
+    train = scale_numeric_features(train)
+    train = fillna(train)
+    train = concat_dummies(train)
+    train.drop(columns=["Ticket", "Name", "Cabin", "Embarked", "Sex"], inplace=True)
+    test = scale_numeric_features(test)
+    test = fillna(test)
+    test = concat_dummies(test)
     test.drop(columns=["Ticket", "Name", "Cabin", "Embarked", "Sex"], inplace=True)
 
-    X_train = titanic.drop(columns="Survived").drop(columns="PassengerId")
-    y_train = titanic["Survived"]
-    X_test = test.drop(columns="PassengerId")
+    # Split X & y
+    X_train = train.drop(columns="Survived").drop(columns="PassengerId")
+    y_train = train["Survived"]
 
-    lr = LogisticRegression(max_iter=2000,)
-    cv = cross_val_score(lr, X_train, y_train, cv=5)
-    print(cv)
-    print(cv.mean())
+    # Modeling & CV
+    lr = modeling_cv(X_train, y_train, LogisticRegression, max_iter=2000)
+    gnb = modeling_cv(X_train, y_train, GaussianNB)
+    dt = modeling_cv(X_train, y_train, tree.DecisionTreeClassifier, random_state=1)
+    knn = modeling_cv(X_train, y_train, KNeighborsClassifier)
+    rf = modeling_cv(X_train, y_train, RandomForestClassifier, random_state=1)
+    svc = modeling_cv(X_train, y_train, SVC, probability=True)
 
-    gnb = GaussianNB()
-    cv = cross_val_score(gnb, X_train, y_train, cv=5)
-    print(cv)
-    print(cv.mean())
-
-    dt = tree.DecisionTreeClassifier(random_state=1)
-    cv = cross_val_score(dt, X_train, y_train, cv=5)
-    print(cv)
-    print(cv.mean())
-
-    knn = KNeighborsClassifier()
-    cv = cross_val_score(knn, X_train, y_train, cv=5)
-    print(cv)
-    print(cv.mean())
-
-    rf = RandomForestClassifier(random_state=1)
-    cv = cross_val_score(rf, X_train, y_train, cv=5)
-    print(cv)
-    print(cv.mean())
-
-    svc = SVC(probability=True)
-    cv = cross_val_score(svc, X_train, y_train, cv=5)
-    print(cv)
-    print(cv.mean())
-
+    # Ensemble
     voting_clf = VotingClassifier(
         estimators=[
             ("lr", lr),
@@ -129,23 +107,12 @@ def modeling_cv(
         ],
         voting="soft",
     )
-
-    mod = GridSearchCV(
-        estimator=voting_clf,
-        param_grid={"max_iter": [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]},
-        cv=5,
-    )
-    mod.fit(X_train, y_train)
-
     cv = cross_val_score(voting_clf, X_train, y_train, cv=5)
     print(cv)
     print(cv.mean())
-
     voting_clf.fit(X_train, y_train)
-    y_hat_base_vc = voting_clf.predict(X_test).astype(int)
-    basic_submission = {"PassengerId": test.PassengerId, "Survived": y_hat_base_vc}
-    base_submission = pd.DataFrame(data=basic_submission)
-    base_submission.to_csv("base_submission.csv", index=False)
+
+    create_submission(voting_clf, test)
 
 
 if __name__ == "__main__":
