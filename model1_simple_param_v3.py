@@ -17,9 +17,10 @@ from sklearn.ensemble import VotingClassifier
 # import GridSearch for parameter optimization
 from sklearn.model_selection import GridSearchCV
 
-    titanic = pd.read_csv("/Users/leo/samurai/kaggle/titanic/data/train.csv")
 
-    from sklearn.preprocessing import MinMaxScaler, StandardScaler
+def main():
+
+    titanic = pd.read_csv("/Users/leo/samurai/kaggle/titanic/data/train.csv")
 
     titanic["Fare"] = StandardScaler().fit_transform(titanic[["Fare"]])
     titanic["Age"] = MinMaxScaler().fit_transform(titanic[["Age"]])
@@ -55,14 +56,6 @@ from sklearn.model_selection import GridSearchCV
     y_train = titanic["Survived"]
     X_test = test.drop(columns="PassengerId")
 
-    from sklearn import tree
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.model_selection import cross_val_score
-    from sklearn.naive_bayes import GaussianNB
-    from sklearn.neighbors import KNeighborsClassifier
-    from sklearn.svm import SVC
-
     lr = LogisticRegression(max_iter=2000,)
     cv = cross_val_score(lr, X_train, y_train, cv=5)
     print(cv)
@@ -93,8 +86,6 @@ from sklearn.model_selection import GridSearchCV
     print(cv)
     print(cv.mean())
 
-    from sklearn.ensemble import VotingClassifier
-
     voting_clf = VotingClassifier(
         estimators=[
             ("lr", lr),
@@ -106,8 +97,6 @@ from sklearn.model_selection import GridSearchCV
         ],
         voting="soft",
     )
-
-    from sklearn.model_selection import GridSearchCV
 
     mod = GridSearchCV(
         estimator=voting_clf,
@@ -125,6 +114,7 @@ from sklearn.model_selection import GridSearchCV
     basic_submission = {"PassengerId": test.PassengerId, "Survived": y_hat_base_vc}
     base_submission = pd.DataFrame(data=basic_submission)
     base_submission.to_csv("base_submission.csv", index=False)
+
 
 if __name__ == "__main__":
     main()
