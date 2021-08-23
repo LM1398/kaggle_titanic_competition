@@ -33,7 +33,7 @@ def scale_numeric_features(df: pd.DataFrame) -> pd.DataFrame:
 def add_cabina(df: pd.DataFrame) -> pd.DataFrame:
     df["cabin_name"] = df.Cabin.apply(lambda x: str(x)[0])
     cabin_has_alph = [0 if x == "n" else 1 for x in df["cabin_name"]]
-    df["cabin_a"] = np.asarray(cabin_has_alph).reshape(-1, 1)
+    df["cabin_a"] = cabin_has_alph
 
 
 def add_occ(df: pd.DataFrame) -> pd.DataFrame:
