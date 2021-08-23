@@ -93,24 +93,154 @@ def fillna(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def modeling_cv(
-    X: pd.DataFrame,
-    y: pd.Series,
-    model: Union[
-        LogisticRegression,
-        GaussianNB,
-        tree.DecisionTreeClassifier,
-        KNeighborsClassifier,
-        RandomForestClassifier,
-        SVC,
-    ],
-    **kwargs
-) -> np.ndarray:
-    clf = model(kwargs)
-    cv = cross_val_score(clf, X, y, cv=5)
-    print(cv)
-    print(cv.mean())
-    return clf
+def lr_parameters(X: pd.DataFrame, y: pd.Series) -> object:
+    """Uses GridSearchCV to find the best parameters for LogisticRegression
+
+    Args:
+        X (pd.DataFrame): X_train
+        y (pd.Series): y_train
+
+    Returns:
+        object: lr which is LogisticRegression with the optimized parameters found from GridSearchCV
+    """
+    lr = (
+        GridSearchCV(
+            estimator=LogisticRegression(),
+            param_grid={
+                "max_iter": [1000, 2000, 3000, 4000],
+                "C": [x for x in range(1, 5, 1)],
+                "random_state": [1, 2, 3, 4, 5],
+            },
+            cv=5,
+            verbose=True,
+        )
+        .fit(X, y)
+        .best_estimator_
+    )
+    return lr
+
+
+def knn_parameters(X: pd.DataFrame, y: pd.Series) -> object:
+    """Uses GridSearchCV to find the best parameters for KNeighborsClassifier
+
+    Args:
+        X (pd.DataFrame): X_train
+        y (pd.Series): y_train
+
+    Returns:
+        object: knn which is LogisticRegression with the optimized parameters found from GridSearchCV
+    """
+    knn = (
+        GridSearchCV(
+            estimator=KNeighborsClassifier(),
+            param_grid={
+                "n_neighbors": [4, 5, 6, 7],
+                "leaf_size": [x for x in range(5, 50, 5)],
+                "p": [1, 2],
+                "weights": ["uniform", "distance"],
+            },
+            cv=5,
+            verbose=True,
+        )
+        .fit(X, y)
+        .best_estimator_
+    )
+    return knn
+
+
+def dt_parameters(X: pd.DataFrame, y: pd.Series) -> object:
+    """Uses GridSearchCV to find the best parameters for tree.DecisionTreeClassifier
+
+    Args:
+        X (pd.DataFrame): X_train
+        y (pd.Series): y_train
+
+    Returns:
+        object: dt which is LogisticRegression with the optimized parameters found from GridSearchCV
+    """
+    dt = (
+        GridSearchCV(
+            estimator=tree.DecisionTreeClassifier(),
+            param_grid={
+                "splitter": ["random"],
+                "min_samples_split": [1, 2, 3],
+                "min_samples_leaf": [3, 4, 5, 6],
+                "max_features": ["auto", "sqrt", "log2"],
+                "random_state": [2, 3, 4, 5],
+                "max_leaf_nodes": [4, 5, 6],
+                "class_weight": ["balanced"],
+            },
+            cv=5,
+            verbose=True,
+            n_jobs=-1,
+        )
+        .fit(X, y)
+        .best_estimator_
+    )
+    return dt
+
+
+def svc_parameters(X: pd.DataFrame, y: pd.Series) -> object:
+    """Uses GridSearchCV to find the best parameters for SVC
+
+    Args:
+        X (pd.DataFrame): X_train
+        y (pd.Series): y_train
+
+    Returns:
+        object: svc which is LogisticRegression with the optimized parameters found from GridSearchCV
+    """
+    svc = (
+        GridSearchCV(
+            estimator=SVC(),
+            param_grid={
+                "C": [1, 2, 3, 4, 5],
+                "degree": [1, 2, 3, 4, 5],
+                "shrinking": [True, False],
+                "max_iter": [-3, -2, -1, 1, 2, 3],
+                "decision_function_shape": ["ovo", "ovr"],
+                "kernel": ["lienar", "poly", "rbf", "sigmoid"],
+            },
+            cv=5,
+            verbose=True,
+            n_jobs=-1,
+        )
+        .fit(X, y)
+        .fit(X, y)
+        .best_estimator_
+    )
+    return svc
+
+
+def rf_parameters(X: pd.DataFrame, y: pd.Series) -> object:
+    """Uses GridSearchCV to find the best parameters for RandomForestClassifier
+
+    Args:
+        X (pd.DataFrame): X_train
+        y (pd.Series): y_train
+
+    Returns:
+        object: rf which is LogisticRegression with the optimized parameters found from GridSearchCV
+    """
+    rf = (
+        GridSearchCV(
+            estimator=RandomForestClassifier(),
+            param_grid={
+                "n_estimators": [50, 100, 150, 200, 300],
+                "criterion": ["gini", "entropy"],
+                "min_samples_split": [1, 2, 3, 4, 5],
+                "min_samples_leaf": [1, 2, 3, 4, 5],
+                "max_leaf_nodes": [1, 2, 3, 4, 5],
+                "random_state": [1, 2, 3],
+            },
+            cv=5,
+            verbose=True,
+            n_jobs=-1,
+        )
+        .fit(X, y)
+        .best_estimator_
+    )
+    return rf
 
 
 def create_submission(clf: VotingClassifier, df: pd.DataFrame) -> None:
@@ -127,85 +257,6 @@ def create_submission(clf: VotingClassifier, df: pd.DataFrame) -> None:
     base_submission.to_csv("base_submission.csv", index=False)
 
 
-def lr_parameters(X: pd.DataFrame, y: pd.Series) -> dict:
-    GridSearchCV(
-        estimator=LogisticRegression(),
-        param_grid={
-            "max_iter": [1000, 2000, 3000, 4000],
-            "C": [x for x in range(1, 5, 1)],
-            "random_state": [1, 2, 3, 4, 5],
-        },
-        cv=5,
-        verbose=True,
-    ).fit(X, y).best_params_
-
-
-def knn_parameters(X: pd.DataFrame, y: pd.Series) -> dict:
-    GridSearchCV(
-        estimator=KNeighborsClassifier(),
-        param_grid={
-            "n_neighbors": [4, 5, 6, 7],
-            "leaf_size": [x for x in range(5, 50, 5)],
-            "p": [1, 2],
-            "weights": ["uniform", "distance"],
-        },
-        cv=5,
-        verbose=True,
-    ).fit(X, y).best_params_
-
-
-def dt_parameters(X: pd.DataFrame, y: pd.Series) -> dict:
-    GridSearchCV(
-        estimator=tree.DecisionTreeClassifier(),
-        param_grid={
-            "splitter": ["random"],
-            "min_samples_split": [1, 2, 3],
-            "min_samples_leaf": [3, 4, 5, 6],
-            "max_features": ["auto", "sqrt", "log2"],
-            "random_state": [2, 3, 4, 5],
-            "max_leaf_nodes": [4, 5, 6],
-            "class_weight": ["balanced"],
-        },
-        cv=5,
-        verbose=True,
-        n_jobs=-1,
-    ).fit(X, y).best_params_
-
-
-def svc_parameters(X: pd.DataFrame, y: pd.Series) -> dict:
-    GridSearchCV(
-        estimator=SVC(),
-        param_grid={
-            "C": [1, 2, 3, 4, 5],
-            "degree": [1, 2, 3, 4, 5],
-            "shrinking": [True, False],
-            "max_iter": [-3, -2, -1, 1, 2, 3],
-            "decision_function_shape": ["ovo", "ovr"],
-            "kernel": ["lienar", "poly", "rbf", "sigmoid"],
-        },
-        cv=5,
-        verbose=True,
-        n_jobs=-1,
-    ).fit(X, y).best_params_
-
-
-def rf_parameters(X: pd.DataFrame, y: pd.Series) -> dict:
-    GridSearchCV(
-        estimator=RandomForestClassifier(),
-        param_grid={
-            "n_estimators": [50, 100, 150, 200, 300],
-            "criterion": ["gini", "entropy"],
-            "min_samples_split": [1, 2, 3, 4, 5],
-            "min_samples_leaf": [1, 2, 3, 4, 5],
-            "max_leaf_nodes": [1, 2, 3, 4, 5],
-            "random_state": [1, 2, 3],
-        },
-        cv=5,
-        verbose=True,
-        n_jobs=-1,
-    ).fit(X, y).best_params_
-
-
 def main():
 
     # Load
@@ -213,52 +264,31 @@ def main():
     test = pd.read_csv("/Users/leo/samurai/kaggle/titanic/data/test.csv")
 
     # Preprocess
-    train = scale_numeric_features(train)
-    train = add_occ(train)
-    train = fillna(train)
-    train = concat_dummies(train)
-    train.drop(
-        columns=["Ticket", "Name", "Cabin", "Embarked", "Sex", "cabin_name"],
-        inplace=True,
-    )
-    test = scale_numeric_features(test)
-    test = add_occ(test)
-    test = fillna(test)
-    test = concat_dummies(test)
-    test.drop(
-        columns=["Ticket", "Name", "Cabin", "Embarked", "Sex", "cabin_name"],
-        inplace=True,
-    )
+    for dfs in [test, train]:
+        dfs = scale_numeric_features(dfs)
+        dfs = add_occ(dfs)
+        dfs = fillna(dfs)
+        dfs = concat_dummies(dfs)
+        dfs.drop(
+            columns=["Ticket", "Name", "Cabin", "Embarked", "Sex", "cabin_name"],
+            inplace=True,
+        )
 
     # Split X & y
     X_train = train.drop(columns="Survived").drop(columns="PassengerId")
     y_train = train["Survived"]
-
-    # Modeling & CV
-    lr = modeling_cv(X_train, y_train, LogisticRegression)
-    gnb = modeling_cv(X_train, y_train, GaussianNB)
-    dt = modeling_cv(X_train, y_train, tree.DecisionTreeClassifier, random_state=1)
-    knn = modeling_cv(X_train, y_train, KNeighborsClassifier)
-    rf = modeling_cv(X_train, y_train, RandomForestClassifier, random_state=1)
-    svc = modeling_cv(X_train, y_train, SVC, probability=True)
+    test.drop(columns=("PassengerId"), inplace=True)
 
     # Model Tuning
-    lr_parameters(X_train, y_train)
-    knn_parameters(X_train, y_train)
-    dt_parameters(X_train, y_train)
-    svc_parameters(X_train, y_train)
-    rf_parameters(X_train, y_train)
+    lr = lr_parameters(X_train, y_train)
+    knn = knn_parameters(X_train, y_train)
+    dt = dt_parameters(X_train, y_train)
+    svc = svc_parameters(X_train, y_train)
+    rf = rf_parameters(X_train, y_train)
 
     # Ensemble
     voting_clf = VotingClassifier(
-        estimators=[
-            ("lr", lr),
-            ("knn", knn),
-            ("rf", rf),
-            ("gnb", gnb),
-            ("svc", svc),
-            ("dt", dt),
-        ],
+        estimators=[("lr", lr), ("knn", knn), ("rf", rf), ("svc", svc), ("dt", dt),],
         voting="soft",
     )
     cv = cross_val_score(voting_clf, X_train, y_train, cv=5)
