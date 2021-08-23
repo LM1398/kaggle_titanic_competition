@@ -97,24 +97,15 @@ def main():
     test = pd.read_csv("/Users/leo/samurai/kaggle/titanic/data/test.csv")
 
     # Preprocess
-    train = scale_numeric_features(train)
-    train = add_cabina(train)
-    train = add_occ(train)
-    train = fillna(train)
-    train = concat_dummies(train)
-    train.drop(
-        columns=["Ticket", "Name", "Cabin", "Embarked", "Sex", "cabin_name"],
-        inplace=True,
-    )
-    test = scale_numeric_features(test)
-    test = add_cabina(test)
-    test = add_occ(test)
-    test = fillna(test)
-    test = concat_dummies(test)
-    test.drop(
-        columns=["Ticket", "Name", "Cabin", "Embarked", "Sex", "cabin_name"],
-        inplace=True,
-    )
+    for dfs in [test, train]:
+        dfs = scale_numeric_features(dfs)
+        dfs = add_occ(dfs)
+        dfs = fillna(dfs)
+        dfs = concat_dummies(dfs)
+        dfs.drop(
+            columns=["Ticket", "Name", "Cabin", "Embarked", "Sex", "cabin_name"],
+            inplace=True,
+        )
 
     # Split X & y
     X_train = train.drop(columns="Survived").drop(columns="PassengerId")
