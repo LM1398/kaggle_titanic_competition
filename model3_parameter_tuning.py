@@ -4,9 +4,6 @@
 # Used GridSearchCV to tune parameters
 
 # Import basics
-from typing import Union
-
-import numpy as np
 import pandas as pd
 
 # Import estimators
