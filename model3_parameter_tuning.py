@@ -18,12 +18,22 @@ from sklearn.model_selection import cross_val_score
 # Import GridSearch for parameter optimization
 from sklearn.model_selection import GridSearchCV
 
+
 # Import scaler
 from sklearn.preprocessing import MinMaxScaler, RobustScaler
 from sklearn.svm import SVC
 
 
 def scale_numeric_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Preprocessing the features in the DataFrame using scalers for better model predictions
+    Uses RobustScaler for "Fare" and MinMaxScaler for other numeric columns
+
+    Args:
+        df (pd.DataFrame): train and test
+
+    Returns:
+        pd.DataFrame: train and test with processed columns
+    """
     df["Fare"] = RobustScaler().fit_transform(df[["Fare"]])
     df["Age"] = MinMaxScaler().fit_transform(df[["Age"]])
     df["Pclass"] = MinMaxScaler().fit_transform(df[["Pclass"]])
@@ -33,6 +43,15 @@ def scale_numeric_features(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_occ(df: pd.DataFrame) -> pd.DataFrame:
+    """Addition of occupation column to DataFrames
+    Extracts the second word in "Name" and returns it as the occupation (e.g. Allen, Cpt)
+
+    Args:
+        df (pd.DataFrame): train and test
+
+    Returns:
+        pd.DataFrame: train and test with addition of occupation column 
+    """
     df["occ"] = [name.split(",")[1].split(".")[0] for name in df["Name"]]
     special_occ = []
     for x in df["occ"]:
@@ -48,12 +67,27 @@ def add_occ(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def concat_dummies(df: pd.DataFrame) -> pd.DataFrame:
+    """Creates dummies for "Sex" and "Embarked" to have only numeric data in the DataFrame
+
+    Args:
+        df (pd.DataFrame): train and test
+
+    Returns:
+        pd.DataFrame: train and test with dummy columns for "Sex" and "Embarked"
+    """
     dummies = pd.get_dummies(df[["Sex", "Embarked"]])
     df = pd.concat([df, dummies], axis=1)
     return df
 
 
 def fillna(df: pd.DataFrame) -> pd.DataFrame:
+    """Fill na values in "Age" and "Fare"
+    Args:
+        df (pd.DataFrame): train and test
+
+    Returns:
+        pd.DataFrame: train and test with no na values
+    """
     df["Age"].fillna(df.Age.mean(), inplace=True)
     df["Fare"].fillna(df.Fare.median(), inplace=True)
     return df
@@ -80,6 +114,13 @@ def modeling_cv(
 
 
 def create_submission(clf: VotingClassifier, df: pd.DataFrame) -> None:
+    """Uses the VotingClassifier to predict the Survival of the individuals in the train set
+    Saves a .csv file in the same directory for kaggle submission
+
+    Args:
+        clf (VotingClassifier): [description]
+        df (pd.DataFrame): [description]
+    """
     y_hat_base_vc = clf.predict(df).astype(int)
     basic_submission = {"PassengerId": df.PassengerId, "Survived": y_hat_base_vc}
     base_submission = pd.DataFrame(data=basic_submission)
