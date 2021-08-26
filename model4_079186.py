@@ -26,39 +26,39 @@ from sklearn.svm import SVC
 
 
 def add_family(df: pd.DataFrame) -> pd.DataFrame:
-    """Adds column family to classify people if people have family 
+    """Adds column family to classify people if people have family.
     
     Args:
-        df(pd.DataFrame): train and test
+        df(pd.DataFrame): train and test.
     
     Returns:
-        df(pd.DataFrame): train and test with family
+        df(pd.DataFrame): train and test with family.
     """
     df["family"] = np.add([x for x in df["SibSp"]], [x for x in df["Parch"]])
     return df
 
 
 def add_is_alone(df: pd.DataFrame) -> pd.DataFrame:
-    """Adds column alone to classify people who don't have family
+    """Adds column alone to classify people who don't have family.
     
     Args:
-        df(pd.DataFrame): train and test
+        df(pd.DataFrame): train and test.
     
     Returns:
-        df(pd.DataFrame): train and test with is_alone
+        df(pd.DataFrame): train and test with is_alone.
     """
     df["is_alone"] = [1 if x == 0 else 0 for x in df["family"]]
     return df
 
 
 def scale_numeric_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Preprocessing the features in the DataFrame using scalers for better model predictions
+    """Preprocessing the features in the DataFrame using scalers for better model predictions.
 
     Args:
-        df (pd.DataFrame): train and test
+        df (pd.DataFrame): train and test.
 
     Returns:
-        pd.DataFrame: train and test with processed columns
+        pd.DataFrame: train and test with processed columns.
     """
     sex = []
     for x in df["Sex"].values:
@@ -77,13 +77,13 @@ def scale_numeric_features(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def concat_dummies(df: pd.DataFrame) -> pd.DataFrame:
-    """Creates dummies for "Sex" and "Embarked" to have only numeric data in the DataFrame
+    """Creates dummies for "Sex" and "Embarked" to have only numeric data in the DataFrame.
 
     Args:
-        df (pd.DataFrame): train and test
+        df (pd.DataFrame): train and test.
 
     Returns:
-        pd.DataFrame: train and test with dummy columns for "Sex" and "Embarked"
+        pd.DataFrame: train and test with dummy columns for "Sex" and "Embarked".
     """
     dummies = pd.get_dummies(df[["Embarked"]])
     df = pd.concat([df, dummies], axis=1)
@@ -91,12 +91,12 @@ def concat_dummies(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def fillna(df: pd.DataFrame) -> pd.DataFrame:
-    """Fill na values in "Age" and "Fare"
+    """Fill na values in "Age" and "Fare".
     Args:
-        df (pd.DataFrame): train and test
+        df (pd.DataFrame): train and test.
 
     Returns:
-        pd.DataFrame: train and test with no na values
+        pd.DataFrame: train and test with no na values.
     """
     df["Age"].fillna(df.Age.median(), inplace=True)
     df["Fare"].fillna(df.Fare.mean(), inplace=True)
@@ -104,14 +104,14 @@ def fillna(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def lr_parameters(X: pd.DataFrame, y: pd.Series) -> object:
-    """Uses GridSearchCV to find the best parameters for LogisticRegression
+    """Uses GridSearchCV to find the best parameters for LogisticRegression.
 
     Args:
-        X (pd.DataFrame): X_train
-        y (pd.Series): y_train
+        X (pd.DataFrame): X_train.
+        y (pd.Series): y_train.
 
     Returns:
-        object: lr which is LogisticRegression with the optimized parameters found from GridSearchCV
+        object: lr which is LogisticRegression with the optimized parameters found from GridSearchCV.
     """
     lr = (
         GridSearchCV(
@@ -128,14 +128,14 @@ def lr_parameters(X: pd.DataFrame, y: pd.Series) -> object:
 
 
 def knn_parameters(X: pd.DataFrame, y: pd.Series) -> object:
-    """Uses GridSearchCV to find the best parameters for KNeighborsClassifier
+    """Uses GridSearchCV to find the best parameters for KNeighborsClassifier.
 
     Args:
-        X (pd.DataFrame): X_train
-        y (pd.Series): y_train
+        X (pd.DataFrame): X_train.
+        y (pd.Series): y_train.
 
     Returns:
-        object: knn which is LogisticRegression with the optimized parameters found from GridSearchCV
+        object: knn which is LogisticRegression with the optimized parameters found from GridSearchCV.
     """
     knn = (
         GridSearchCV(
@@ -157,14 +157,14 @@ def knn_parameters(X: pd.DataFrame, y: pd.Series) -> object:
 
 
 def dt_parameters(X: pd.DataFrame, y: pd.Series) -> object:
-    """Uses GridSearchCV to find the best parameters for tree.DecisionTreeClassifier
+    """Uses GridSearchCV to find the best parameters for tree.DecisionTreeClassifier.
 
     Args:
-        X (pd.DataFrame): X_train
-        y (pd.Series): y_train
+        X (pd.DataFrame): X_train.
+        y (pd.Series): y_train.
 
     Returns:
-        object: dt which is LogisticRegression with the optimized parameters found from GridSearchCV
+        object: dt which is LogisticRegression with the optimized parameters found from GridSearchCV.
     """
     dt = (
         GridSearchCV(
@@ -187,14 +187,14 @@ def dt_parameters(X: pd.DataFrame, y: pd.Series) -> object:
 
 
 def svc_parameters(X: pd.DataFrame, y: pd.Series) -> object:
-    """Uses GridSearchCV to find the best parameters for SVC
+    """Uses GridSearchCV to find the best parameters for SVC.
 
     Args:
-        X (pd.DataFrame): X_train
-        y (pd.Series): y_train
+        X (pd.DataFrame): X_train.
+        y (pd.Series): y_train.
 
     Returns:
-        object: svc which is LogisticRegression with the optimized parameters found from GridSearchCV
+        object: svc which is LogisticRegression with the optimized parameters found from GridSearchCV.
     """
     svc = (
         GridSearchCV(
@@ -216,14 +216,14 @@ def svc_parameters(X: pd.DataFrame, y: pd.Series) -> object:
 
 
 def rf_parameters(X: pd.DataFrame, y: pd.Series) -> object:
-    """Uses GridSearchCV to find the best parameters for RandomForestClassifier
+    """Uses GridSearchCV to find the best parameters for RandomForestClassifier.
 
     Args:
-        X (pd.DataFrame): X_train
-        y (pd.Series): y_train
+        X (pd.DataFrame): X_train.
+        y (pd.Series): y_train.
 
     Returns:
-        object: rf which is LogisticRegression with the optimized parameters found from GridSearchCV
+        object: rf which is LogisticRegression with the optimized parameters found from GridSearchCV.
     """
     rf = (
         GridSearchCV(
@@ -246,8 +246,8 @@ def rf_parameters(X: pd.DataFrame, y: pd.Series) -> object:
 
 
 def create_submission(clf: VotingClassifier, df: pd.DataFrame) -> None:
-    """Uses the VotingClassifier to predict the Survival of the individuals in the train set
-    Saves a .csv file in the same directory for kaggle submission
+    """Uses the VotingClassifier to predict the Survival of the individuals in the train set.
+    Saves a .csv file in the same directory for kaggle submission.
 
     Args:
         clf (VotingClassifier): [description]
