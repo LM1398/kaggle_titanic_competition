@@ -1,8 +1,10 @@
-# Differences:
-# Added family and is_alone column
-# Less model tuning
-# Changed preprocess from for loop to previous set up because it kept returnig errors
-# Drop SibSp and Parch
+    """Scripts for titanic kaggle competition. Differences from previous models: Added family and is_alone column, Less model tuning,
+    Changed preprocess from for loop to previous set up because it kept returnig errors, Drops SibSp and Parch.
+
+    Returns:
+        csv: csv file with survival prediction for test dataset.
+    """
+
 
 # Import basics
 
