@@ -1,2 +1,3 @@
-# Test_Notebook
-Code written in test for Samurai Engineering
+# Kaggle Competition (data science)
+Code written for titanic and predict future sales competitions
+Used Python, pandas, scikit-learn, numpy on jupyter lab
